@@ -4,6 +4,9 @@ tts/
 # Output files
 output/
 
+# Cached audio files
+cache/
+
 # VSCode settings
 .vscode/
 
