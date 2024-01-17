@@ -29,7 +29,9 @@ speech_config = speechsdk.SpeechConfig(
 )
 
 # The language of the voice that speaks.
-speech_config.speech_synthesis_voice_name = "ja-JP-NanamiNeural"
+# speech_config.speech_synthesis_voice_name = "ja-JP-NanamiNeural"
+# speech_config.speech_synthesis_voice_name = "ja-JP-KeitaNeural"
+speech_config.speech_synthesis_voice_name = "ja-JP-NaokiNeural"
 
 
 @app.command()
@@ -42,7 +44,9 @@ def tts(
         os.makedirs(cache_dir)
 
     # Check if the synthesized speech of the input text is already in the cache.
-    cache_path = r.get(text)
+    # Use the text and the voice name as the key.
+    cache_key = speech_config.speech_synthesis_voice_name + ":" + text
+    cache_path = r.get(cache_key)
     if cache_path is not None:
         print("Found in cache.")
         cache_path = cache_path.decode("utf-8")
@@ -56,7 +60,7 @@ def tts(
 
         # Otherwise, delete the invalid cache.
         print("Cache is not valid.")
-        r.delete(text)
+        r.delete(cache_key)
         print("Deleted invalid cache.")
 
     # If not found in cache or cache is invalid, synthesize the text and store it in the cache.
@@ -71,7 +75,7 @@ def tts(
     speech_synthesizer.speak_text_async(text).get()
 
     # Cache the synthesized speech.
-    r.set(text, cache_path)
+    r.set(cache_key, cache_path)
 
     # Copy the synthesized speech from the cache to the output path.
     shutil.copy(cache_path, output)
