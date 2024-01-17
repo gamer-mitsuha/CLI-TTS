@@ -17,6 +17,8 @@ import typer
 
 app = typer.Typer()
 
+# Redis is not directly supported on Windows.
+# Make sure you have a Redis server running on localhost:6379 on wsl2.
 pool = redis.ConnectionPool(host="localhost", port=6379, db=0)
 r = redis.Redis(connection_pool=pool)
 
