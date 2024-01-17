@@ -7,6 +7,7 @@ Example usage:
   python tts.py "こんにちは。私はPythonです。" --output output.wav
 """
 
+from enum import Enum
 import os
 import shutil
 import uuid
@@ -30,20 +31,32 @@ speech_config = speechsdk.SpeechConfig(
     subscription=os.environ.get("SPEECH_KEY"), region=os.environ.get("SPEECH_REGION")
 )
 
-# The language of the voice that speaks.
-# speech_config.speech_synthesis_voice_name = "ja-JP-NanamiNeural"
-# speech_config.speech_synthesis_voice_name = "ja-JP-KeitaNeural"
-speech_config.speech_synthesis_voice_name = "ja-JP-NaokiNeural"
+class VoiceName(str, Enum):
+    # Female
+    Nanami = 'Nanami'
+    Mayu = 'Mayu'
+    Aoi = 'Aoi'
+    Shiori = 'Shiori'
+    # Male
+    Keita = 'Keita'
+    Naoki = 'Naoki'
+    Daichi = 'Daichi'
 
 
 @app.command()
 def tts(
-    text: str, output: str = "output/sample.wav", cache_dir: str = DEFAULT_CACHE_DIR
+    text: str, 
+    output: str = "output/sample.wav", 
+    cache_dir: str = DEFAULT_CACHE_DIR, 
+    voice_name: VoiceName = VoiceName.Nanami
 ):
     """Simple command line interface for text to speech."""
 
     if not os.path.exists(cache_dir):
         os.makedirs(cache_dir)
+
+    speech_config.speech_synthesis_voice_name = f"ja-JP-{voice_name.value}Neural"
+    print(f"Voice name: {speech_config.speech_synthesis_voice_name}")
 
     # Check if the synthesized speech of the input text is already in the cache.
     # Use the text and the voice name as the key.
